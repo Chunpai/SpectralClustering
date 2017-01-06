@@ -2,14 +2,14 @@ import numpy as np
 from numpy import linalg as LA
 import math
 import random
+import matplotlib.pyplot as plt
 
-
-def initialize(data):
+def initialize(data, k):
     '''
     initilize the cluster k representations
     input data is n*d numpy ndarray
     '''
-    n,k = data.shape
+    n,p = data.shape
     cluster_reps = []
     initial_indices = []
     for i in range(k):
@@ -35,10 +35,10 @@ def computeMean(data_list):
     return mean
 
 
-def find_optimal_reps(cluster_reps,data):
+def find_optimal_reps(data, cluster_reps):
     clusters = {}
-    dims = len(cluster_reps)
-    for i in range(dims):
+    k = len(cluster_reps)
+    for i in range(k):
         clusters[i] = []
         clusters[i].append(cluster_reps[i])
     
@@ -46,7 +46,7 @@ def find_optimal_reps(cluster_reps,data):
     for e in data:
         line += 1
         #print line
-        minimum = 1000000
+        minimum = np.inf 
         min_index = 0
         index = -1
         for rep in cluster_reps:
@@ -63,17 +63,20 @@ def find_optimal_reps(cluster_reps,data):
         #print "new",new_rep
         cluster_reps[min_index] = new_rep
         #print clusters[0]
-    return cluster_reps 
+    return cluster_reps, clusters 
         
 
-def k_mean(k,data):
-    cluster_reps = initialize(k,data)
+def k_means(data, k):
+    cluster_reps = initialize(data, k)
     print "initial", cluster_reps
-    new_cluster_reps = find_optimal_reps(cluster_reps, data)
+    new_cluster_reps, clusters = find_optimal_reps(data, cluster_reps)
     print "1st", new_cluster_reps
-    #new_cluster_reps = find_optimal_reps(cluster_reps, data)
-    #print "2nd", new_cluster_reps
-    return new_cluster_reps
+    print "optional reassignment"
+    new_cluster_reps, clusters = find_optimal_reps(data, cluster_reps)
+    print "2nd", new_cluster_reps
+    new_cluster_reps, clusters = find_optimal_reps(data, cluster_reps)
+    print '3rd', new_cluster_reps
+    return new_cluster_reps, clusters
 
 
 def sum_l1_distance(cluster_reps, data): 
@@ -88,3 +91,14 @@ def sum_l1_distance(cluster_reps, data):
     print "(2-mean) sum of total l1 distance", sum
 
 
+
+def plot(clusters,k):
+    plt.xlabel('x')
+    plt.axis([-1,1,-1,1])
+    color_list = {0:'red',1:'green',2:'blue',3:'yellow'}
+    for i in range(k):
+        c = np.array(clusters[i])
+        x = c[:,0]
+        y = c[:,1]
+        plt.plot(list(x), list(y), marker=',', color=color_list[i])
+    plt.savefig("sc.png")    

@@ -4,8 +4,8 @@ import numpy.linalg as LA
 import scipy as sp
 import scipy.sparse.linalg as sLA
 import pickle
-
-
+from k_means import k_means
+from k_means import plot
 
 def readNetwork(data_dir, filename):
     '''
@@ -64,16 +64,10 @@ def spectralClustering(L, k, eigenpairs= None):
     
     print np.array(V).shape
     M = np.array(V).T
-    k_means(M)
-    return 
-
-
-def k_means(M):
-    '''
-    input n*k numpy ndarray M
+    cluster_reps, clusters = k_means(M, k)
+    #print len(clusters[0]), len(clusters[1])
+    #plot(clusters,k)
     return clusters
-    '''
-    k = M.shape[1]
 
 
 
@@ -84,7 +78,7 @@ if __name__ == '__main__':
     eigenpair_pickle = 'eigenpairs.pkl'
     #readNetwork(data_dir, network)
     L, eigenpairs = serializationLoad(data_dir,laplapcian_pickle, eigenpair_pickle)
-    k = 2
+    k = 4
     spectralClustering(L, k, eigenpairs)
 
 
