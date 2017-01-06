@@ -23,14 +23,14 @@ def initialize(data):
     return cluster_reps 
 
 
-
-def compute_mean(data_list):
+def computeMean(data_list):
+    '''
+    '''
     data_list = np.array(data_list)
     mean = [] 
     dims = len(data_list[0])
-    for d in range(dims):
-        #print d, data_list[:,d]
-        m = np.mean(data_list[:,d])
+    for i in range(dims):
+        m = np.mean(data_list[:,i])
         mean.append(m)
     return mean
 
@@ -58,7 +58,7 @@ def find_optimal_reps(cluster_reps,data):
                 minimum = l1
                 min_index = index
         clusters[min_index].append(e)
-        new_rep = compute_mean(clusters[min_index])
+        new_rep = computeMean(clusters[min_index])
         #print "old",cluster_reps[min_index]
         #print "new",new_rep
         cluster_reps[min_index] = new_rep
