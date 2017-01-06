@@ -32,12 +32,13 @@ def readNetwork(data_dir, filename):
     pickle.dump((eig_vals,eig_vecs), open(data_dir+'eigenpairs.pkl','wb'))
 
 
-def serieizationRead(data_dir, laplapcian_pickle, eigenpair_pickle):
+def serializationLoad(data_dir, laplapcian_pickle, eigenpair_pickle):
     L = pickle.load(open(data_dir+laplapcian_pickle,'rb'))
     eigenpairs = pickle.load(open(data_dir+eigenpair_pickle,'rd'))
     return L, eigenpairs
 
-def spectralClustering(L, k):
+
+def spectralClustering(L, k, eigenpairs= None):
     '''
     input the unnormalized laplacian matrix L (numpy ndarray), and cluster number k (int) 
     
@@ -47,8 +48,33 @@ def spectralClustering(L, k):
     #A = sp.sparse.csr_matrix(L) #store laplacian into scipy sparse matrix,which can compute the eigenvalues fast
     #e_vals, e_vecs = sLA.eigs(A,L.shape[0] -2)
     #e_vals, e_vecs = LA.eig(L)  
-
+    
+    (eig_vals, eig_vecs) = eigenpairs
+    indices = sorted(range(len(eig_vals)), key=lambda k: eig_vals[k]) 
+    count = 0
+    V = []
+    for i in range(L.shape[0]):
+        if eig_vals[indices[i]] == 0.0:
+            continue
+        else:
+            V.append(eig_vecs[indices[i]])
+            count += 1 
+        if count == k:
+            break
+    
+    print np.array(V).shape
+    M = np.array(V).T
+    k_means(M)
     return 
+
+
+def k_means(M):
+    '''
+    input n*k numpy ndarray M
+    return clusters
+    '''
+    k = M.shape[1]
+
 
 
 if __name__ == '__main__':
@@ -57,8 +83,8 @@ if __name__ == '__main__':
     laplapcian_pickle = 'Laplacian.pkl'
     eigenpair_pickle = 'eigenpairs.pkl'
     #readNetwork(data_dir, network)
-    L, eigenpairs = serieizationRead(data_dir,laplapcian_pickle, eigenpair_pickle)
+    L, eigenpairs = serializationLoad(data_dir,laplapcian_pickle, eigenpair_pickle)
     k = 2
-    spectralClustering(L, eigenpairs, k)
+    spectralClustering(L, k, eigenpairs)
 
 
